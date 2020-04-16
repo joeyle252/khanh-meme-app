@@ -20,18 +20,26 @@ router.post('/upload', upload, function (req, res, next) {
     res.render("allimages", { error: "you need to upload a file" })
   };
   const data = loadData();
+  // res.render("allimages", {images: data})
   Jimp.read(req.file.path, (err, pic) => {
+  
     console.log("pic",pic)
     if (err) throw err;
     pic
       .resize(256, 256) // resize
       .quality(60) // set JPEG quality
       .greyscale() // set greyscale
-      .write(req.file.path, ()=>{
+      .writeAsync(req.file.path)
+      .then(()=>{
+        debugger;
         data.push(req.file)
         saveData(data);
-        res.render("allimages", { images: data })
-      }); // save
+        res.render("allimages", {images: data})
+      })
+      .catch((err)=>{
+        console.log(err)
+
+      })
     
   });
       
