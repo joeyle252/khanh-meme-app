@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var jimp = require('jimp');
+var events = require('events');
+var em = events.EventEmitter();
 const path = require("path");
+const fs = require("fs")
 const upload = require("../utils/upload");
 const { loadData, saveData } = require("../utils/data.js");
 
@@ -16,7 +19,10 @@ router.get("/browser", (req, res) => {
 });
 
 router.post("/upload", upload, async (req, res) => {
+  
   const {file} = req;
+  
+  console.log({file})
   if (!file) {
     return res.render("index", { error: "you need to upload a file" })
   };
@@ -28,19 +34,49 @@ router.post("/upload", upload, async (req, res) => {
   }
   try {
     let image = await jimp.read(file.path);
-    image.resize(250, jimp.AUTO, jimp.RESIZE_NEAREST_NEIGHBOR);
+    image.resize(300, jimp.AUTO, jimp.RESIZE_NEAREST_NEIGHBOR);
     await image.writeAsync(file.path);
 
-    image.id = data.length === 0 ? 1 : data[data.length - 1].id + 1
+    image.id = data.length === 0 ? 1 : data[data.length - 1].id + 1;
     data.push(file);
     saveData(data);
 
-    res.render("allimages", { images: data })
+    res.render("allimages", { images: data });
   } catch (e) {// error object
     fs.unlinkSync(file.path);
     return res.render("index", { error: e.message })
   }
 })
+
+router.get('/memes', async function (req,res){
+  const data = loadData();
+  res.render("allmemeimages", { images: data })
+})
+
+
+module.exports = router;
+
+
+/*
+router.post('/upload', upload, async function (req, res) {
+  if (!req.file) {
+    res.render("index", { error: "you need to upload a file" })
+  };
+  // const pathToUpload = path.join(__dirname,"../public/uploads");
+  const data = loadData();
+
+  const image = await jimp.read(req.file.path);
+  image.resize(300,jimp.AUTO, jimp.RESIZE_NEAREST_NEIGHBOR);
+  await image.writeAsync(req.file.path); 
+  
+  data.push(req.file)
+  saveData(data);
+  
+    res.render("allimages", { images: data })
+  
+  
+});
+*/
 
 /*
 router.post('/upload', upload, async function (req, res, next) {
@@ -62,5 +98,3 @@ router.post('/upload', upload, async function (req, res, next) {
 });
 */
 
-
-module.exports = router;

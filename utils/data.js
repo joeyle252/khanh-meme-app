@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const pathToData = path.join(__dirname, "../images.json");
+const pathToMemeData = path.join(__dirname, "../memes.json")
 
 function loadData() {
     const buffer = fs.readFileSync(pathToData);
@@ -16,7 +17,19 @@ function saveData(data) {
 
 }
 
-module.exports = { loadData, saveData };
+function loadMemeData() {
+    const buffer = fs.readFileSync(pathToMemeData);
+    const memeData = buffer.toString();
+    return JSON.parse(memeData);
+
+};
+
+function saveMemeData(memeData) {
+    fs.writeFileSync(pathToMemeData, JSON.stringify(memeData));
+
+}
+
+module.exports = { loadData, saveData, loadMemeData, saveMemeData  };
 
 
 
