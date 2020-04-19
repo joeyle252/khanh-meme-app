@@ -101,13 +101,14 @@ let newName = Date.now().toString()+ selectedImage.filename
   }
   memeData.push(newmemeData);
   saveMemeData(memeData);
-  res.render('allmemeimages', {image: memeData})
+  
 
  });
 
 
 router.get("/meme", async (req, res) => {
-  
+  const memeData = loadMemeData();
+  res.render('allmemeimages', {images: memeData})
 
 });
 
