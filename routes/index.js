@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var jimp = require('jimp');
-var events = require('events');
 const path = require("path");
 const fs = require("fs")
 const upload = require("../utils/upload");
@@ -34,7 +33,7 @@ router.post("/upload", upload, async (req, res) => {
   }
   try {
     let image = await jimp.read(file.path);
-    image.resize(300, 300, jimp.RESIZE_NEAREST_NEIGHBOR);
+    image.resize(250, 250, jimp.RESIZE_NEAREST_NEIGHBOR);
     await image.writeAsync(file.path);
 
     file.id = data.length === 0 ? 1 : data[data.length - 1].id + 1;
@@ -48,7 +47,6 @@ router.post("/upload", upload, async (req, res) => {
   }
 });
 
-
 router.post("/addmeme", async (req, res) => {
 
   const {top, bottom,id} = req.body;
@@ -61,15 +59,14 @@ router.post("/addmeme", async (req, res) => {
   const data = loadData()
   const selectedImageIndex = data.findIndex(image=>image.id === id*1)
   if(selectedImageIndex === -1){
-    return res.render('allmemeimages', {message: "please submit some text"})
+    return res.render('error', {message: "please submit some text"})
   }
   const selectedImage = data[selectedImageIndex]
   let image = await jimp.read(selectedImage.path);
   const font = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
   image.print(
     font,
-    0,
-    0,
+    0,0,
     {
       text: top,
       alignmentX: jimp.HORIZONTAL_ALIGN_CENTER,
@@ -80,8 +77,7 @@ router.post("/addmeme", async (req, res) => {
   );
   image.print(
     font,
-    0,
-    0,
+    0,0,
     {
       text: bottom,
       alignmentX: jimp.HORIZONTAL_ALIGN_CENTER,
@@ -90,6 +86,7 @@ router.post("/addmeme", async (req, res) => {
     image.bitmap.width,
     image.bitmap.height,
   );
+
 let newName = Date.now().toString()+ selectedImage.filename
   await image.writeAsync(`${pathToMemepictures}/${newName}`)
 
@@ -101,10 +98,8 @@ let newName = Date.now().toString()+ selectedImage.filename
   }
   memeData.push(newmemeData);
   saveMemeData(memeData);
-  
-
+  res.render('allmemeimages', {images: memeData})
  });
-
 
 router.get("/meme", async (req, res) => {
   const memeData = loadMemeData();
@@ -112,61 +107,4 @@ router.get("/meme", async (req, res) => {
 
 });
 
-
-// 1. users click to pictures => show modal =>
-// 2. users fill text at input
-
-// 3. users click saved
-//  jimp get text from input => message and add to pictures
-
-// saveMemeData will push meme pictures to memes file
-
-
-
-
-
-
 module.exports = router;
-
-
-/*
-router.post('/upload', upload, async function (req, res) {
-  if (!req.file) {
-    res.render("index", { error: "you need to upload a file" })
-  };
-  // const pathToUpload = path.join(__dirname,"../public/uploads");
-  const data = loadData();
-
-  const image = await jimp.read(req.file.path);
-  image.resize(300,jimp.AUTO, jimp.RESIZE_NEAREST_NEIGHBOR);
-  await image.writeAsync(req.file.path); 
-  
-  data.push(req.file)
-  saveData(data);
-  
-    res.render("allimages", { images: data })
-  
-  
-});
-*/
-
-/*
-router.post('/upload', upload, async function (req, res, next) {
-  if (!req.file) {
-    res.render("allimages", { error: "you need to upload a file" })
-  };
-  const pathToUpload = path.join(__dirname,"../public/uploads");
-  const data = loadData();
-  const name = `${req.file.filename.split('.')[0]}_150x150.jpg`
-  const image = await Jimp.read(req.file.path);
-  await image.resize(Jimp.AUTO, 300, Jimp.RESIZE_BEZIER);
-  await image.writeAsync(`${pathToUpload}/${name}`);
-  const newFile = {filename:name}
-  data.push(newFile)
-  saveData(data);
-  setTimeout(()=>{
-    res.render("allimages", { images: data })
-  },8000)
-});
-*/
-

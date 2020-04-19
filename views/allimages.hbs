@@ -40,7 +40,7 @@ aria-hidden="true">
             </div>
             <form method="post" action="/addmeme">
             <div> 
-                <input type="text" name="id" value="" aria-hidden="true" id="photo-id" /> 
+                <input type="hidden" name="id" id="photo-id" /> 
             </div>
             <div>
                 <input type="text" placeholder="text for the top" class="inputTop" name="top"/>
@@ -58,21 +58,3 @@ aria-hidden="true">
     </div>
 </div>
 
-
-
-{{!-- function getInputTop() {
-        const inputValTop = document.getElementByClassName('inputTop').value;
-    };
-    console.log('khanh2')
-    
-    function getInputBottom() {
-        const inputValBottom = document.getElementByClassName('inputBottom').value;
-    };
-    console.log('khanh3')
-    
-    const saveButton = document.getElementById('saveButton');
-    saveButton.addEventListener('click',()=> {
-        getInputTop();
-        getInputBottom();
-    })
-    console.log('khanh4') --}}
